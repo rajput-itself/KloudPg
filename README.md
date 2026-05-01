@@ -1,6 +1,8 @@
 # KloudPG - PG Accommodation Booking Platform
 
-A modern web application for finding and booking PG (Paying Guest) accommodations. Built with React 19, Vite, and Node.js backend with SQLite database.
+KloudPg is a full-stack web application designed to simplify the process of finding and booking Paying Guest (PG) accommodations. It connects users with verified PG listings, offering a smooth and intuitive booking experience.
+
+The platform focuses on usability, transparency, and efficiency—allowing users to search, compare, and reserve PGs based on location, budget, amenities, and availability
 ## Developed by
 Aaditya Ray Rajput
 Aishwarya Ghadage
