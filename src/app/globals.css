@@ -2633,6 +2633,13 @@ textarea.form-input {
   margin-bottom: 20px;
 }
 
+.admin-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .responsive-table {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -2664,6 +2671,84 @@ textarea.form-input {
 .module-tabs .btn {
   white-space: nowrap;
   flex-shrink: 0;
+}
+
+.admin-report-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.admin-report-panel {
+  background: #FFFFFF;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-report-panel h2 {
+  font-size: 1.05rem;
+  margin-bottom: 14px;
+}
+
+.admin-report-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  text-transform: capitalize;
+}
+
+.admin-report-row:last-child {
+  border-bottom: 0;
+}
+
+.admin-report-bar {
+  grid-column: 1 / -1;
+  height: 8px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.admin-report-bar span {
+  display: block;
+  height: 100%;
+  background: var(--primary);
+  border-radius: inherit;
+}
+
+.admin-report-bar.danger span {
+  background: var(--danger);
+}
+
+.admin-report-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-heading);
+}
+
+.admin-report-list-item:last-child {
+  border-bottom: 0;
+}
+
+.admin-report-list-item span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.admin-report-list-item small {
+  color: var(--text-muted);
+  font-size: 0.78rem;
 }
 
 .dashboard-alert {
@@ -3250,6 +3335,14 @@ textarea.form-input {
     flex-direction: column;
   }
 
+  .admin-header-actions {
+    width: 100%;
+  }
+
+  .admin-header-actions .btn {
+    flex: 1;
+  }
+
   .admin-toolbar .form-select,
   .admin-toolbar .btn {
     width: 100% !important;
@@ -3259,6 +3352,10 @@ textarea.form-input {
     margin-left: -16px;
     margin-right: -16px;
     padding: 0 16px 2px;
+  }
+
+  .admin-report-grid {
+    grid-template-columns: 1fr;
   }
 
   .dashboard-alert {

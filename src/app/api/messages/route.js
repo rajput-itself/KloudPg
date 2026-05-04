@@ -21,22 +21,61 @@ export async function GET(request) {
     const { messages, pgs, users } = await getCollections();
     const url = new URL(request.url);
     const pg_id = url.searchParams.get('pg_id');
+    const otherUserIdParam = url.searchParams.get('other_user_id');
+    const otherUserId = otherUserIdParam ? toInt(otherUserIdParam) : null;
 
     if (pg_id) {
       const pgId = toInt(pg_id);
       const pg = await pgs.findOne({ id: pgId }, { projection: { _id: 0, owner_id: 1, name: 1 } });
       if (!pg) return NextResponse.json({ error: 'PG not found' }, { status: 404 });
 
+      let threadUserId = otherUserId;
+      if (!threadUserId) {
+        if (user.id === pg.owner_id) {
+          const latest = await messages.find({
+            pg_id: pgId,
+            $or: [
+              { sender_id: pg.owner_id },
+              { receiver_id: pg.owner_id },
+            ],
+          }, { projection: { sender_id: 1, receiver_id: 1 } }).sort({ created_at: -1 }).limit(1).toArray();
+
+          if (latest.length > 0) {
+            const row = latest[0];
+            threadUserId = row.sender_id === pg.owner_id ? row.receiver_id : row.sender_id;
+          }
+        } else {
+          threadUserId = pg.owner_id;
+        }
+      }
+
+      if (!threadUserId) {
+        return NextResponse.json({ messages: [], pg_owner_id: pg.owner_id, pg_name: pg.name });
+      }
+
+      if (threadUserId === user.id) return NextResponse.json({ error: 'Cannot message yourself' }, { status: 400 });
+      if (user.id !== pg.owner_id && threadUserId !== pg.owner_id) {
+        return NextResponse.json({ error: 'Invalid conversation for this PG' }, { status: 400 });
+      }
+
       const rows = await messages.find({
         pg_id: pgId,
         $or: [
-          { sender_id: user.id, receiver_id: pg.owner_id },
-          { sender_id: pg.owner_id, receiver_id: user.id },
+          { sender_id: user.id, receiver_id: threadUserId },
+          { sender_id: threadUserId, receiver_id: user.id },
         ],
       }, { projection: { _id: 0 } }).sort({ created_at: 1 }).toArray();
 
-      await messages.updateMany({ pg_id: pgId, receiver_id: user.id }, { $set: { is_read: 1 } });
-      return NextResponse.json({ messages: await enrichMessages(rows, users), pg_owner_id: pg.owner_id, pg_name: pg.name });
+      await messages.updateMany({ pg_id: pgId, receiver_id: user.id, sender_id: threadUserId }, { $set: { is_read: 1 } });
+      const threadUser = await users.findOne({ id: threadUserId }, { projection: { _id: 0, id: 1, name: 1 } });
+
+      return NextResponse.json({
+        messages: await enrichMessages(rows, users),
+        pg_owner_id: pg.owner_id,
+        pg_name: pg.name,
+        other_user_id: threadUserId,
+        other_user_name: threadUser?.name || null,
+      });
     }
 
     const rows = await messages.find(
